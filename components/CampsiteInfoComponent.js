@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { Text, View, ScrollView, FlatList, Modal, Button, StyleSheet} from 'react-native';
+import { Text, View, ScrollView, FlatList, Modal, Button, StyleSheet } from 'react-native';
 import { Card, Icon, Rating, Input } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { baseUrl } from '../shared/baseUrl';
-import { postFavorite, addComment } from '../redux/ActionCreators';
-import { postComment } from '../redux/ActionCreators';
+import { postFavorite, postComment } from '../redux/ActionCreators';
+
 
 
 const mapStateToProps = state => {
@@ -17,15 +17,9 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = {
     postFavorite: campsiteId => (postFavorite(campsiteId)),
-    
-    postComment: (campsiteId,
-        rating,
-        author,
-        text) => (postComment(campsiteId,
-            rating,
-            author,
-            text))
-    };
+
+    postComment: (campsiteId, rating, author, comment) => (postComment(campsiteId, rating, author, comment))
+};
 
 function RenderCampsite(props) {
     const { campsite } = props;
@@ -68,12 +62,12 @@ function RenderComments({ comments }) {
 
     renderCommentItem = ({ item }) => {
 
-        
+
 
         return (
             <View style={{ margin: 10 }}>
                 <Text style={{ fontSize: 14 }}>{item.text}</Text>
-                <Rating 
+                <Rating
                     style={{ alignItems: 'flex-start', paddingVertical: '5%' }}
                     startingValue={item.rating}
                     imageSize={10}
@@ -100,7 +94,7 @@ class CampsiteInfo extends Component {
     constructor(props) {
         super(props);
 
-        this.state= {
+        this.state = {
             showModal: false,
             rating: 5,
             author: '',
@@ -114,10 +108,9 @@ class CampsiteInfo extends Component {
 
     handleComment(campsiteId) {
         console.log(this.props);
-        postComment(campsiteId, this.state.rating,
-            this.state.author,
-            this.state.text)
-        
+
+        this.props.postComment(campsiteId, this.state.rating, this.state.author, this.state.text);
+
         this.toggleModal();
     };
 
@@ -161,8 +154,8 @@ class CampsiteInfo extends Component {
                             startingValue={this.state.rating}
                             imageSize={40}
                             onFinishRating={(rating) => this.setState({ rating: rating })}
-                            style={{paddingVertical: 10}}
-                            />
+                            style={{ paddingVertical: 10 }}
+                        />
                         <Input
                             placeholder='Author'
                             leftIcon={
@@ -170,24 +163,24 @@ class CampsiteInfo extends Component {
                                     name='user-o'
                                     type='font-awesome'
                                 />}
-                            leftIconContainerStyle={{paddingRight: 10}}
-                            onChangeText={(author) => this.setState({author: author})}
-                            value
+                            leftIconContainerStyle={{ paddingRight: 10 }}
+                            onChangeText={(author) => this.setState({ author: author })}
+
                         />
                         <Input
                             placeholder='Comment'
                             leftIcon={
                                 <Icon
-                                name='comment-o'
-                                type='font-awesome'
+                                    name='comment-o'
+                                    type='font-awesome'
                                 />
                             }
                             leftIconContainerStyle={{ paddingRight: 10 }}
-                            onChangeText={(text) => this.setState({text: text})}
-                            value
+                            onChangeText={(text) => this.setState({ text: text })}
+
                         />
-                        <View style={{margin:10}}>
-                           <Button 
+                        <View style={{ margin: 10 }}>
+                            <Button
                                 title='Submit'
                                 color='#5637DD'
                                 onPress={() => {
@@ -196,9 +189,9 @@ class CampsiteInfo extends Component {
                                 }}
                             />
                         </View>
-                        
-                        <View style={{margin:10}}>
-                            <Button 
+
+                        <View style={{ margin: 10 }}>
+                            <Button
                                 onPress={() => {
                                     this.toggleModal();
                                     this.resetForm();
@@ -214,22 +207,22 @@ class CampsiteInfo extends Component {
     }
 }
 
- styles = StyleSheet.create({
-     cardRow: {
-         alignItems: 'center',
-         justifyContent: 'center',
-         flex: 1,
-         flexDirection: 'row',
-         margin: 20
-     },
-     cardItem: {
-         flex: 1,
-         margin: 10,
-     },
-     modal: {
-         justifyContent: 'center',
-         margin: 20
-     }
- })
+styles = StyleSheet.create({
+    cardRow: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 1,
+        flexDirection: 'row',
+        margin: 20
+    },
+    cardItem: {
+        flex: 1,
+        margin: 10,
+    },
+    modal: {
+        justifyContent: 'center',
+        margin: 20
+    }
+})
 
 export default connect(mapStateToProps, mapDispatchToProps)(CampsiteInfo);
