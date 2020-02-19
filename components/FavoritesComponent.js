@@ -1,16 +1,22 @@
-import React, {Component} from 'react';
-import {FlatList, View, Text } from 'react-native';
+import React, { Component } from 'react';
+import { FlatList, View, Text, Alert } from 'react-native';
 import { ListItem } from 'react-native-elements';
 import { connect } from 'react-redux';
-import {Loading} from './LoadingComponent';
+import { Loading } from './LoadingComponent';
 import { baseUrl } from '../shared/baseUrl';
+import Swipeout from 'react-native-swipeout';
+import { deleteFavorite } from '../redux/ActionCreators';
 
 const mapStateToProps = state => {
     return {
         campsites: state.campsites,
         favorites: state.favorites
     };
-}
+};
+
+const mapDispatchToProps = {
+    deleteFavorite: campsiteId => (deleteFavorite(campsiteId))
+};
 
 class Favorites extends Component {
 
@@ -21,22 +27,51 @@ class Favorites extends Component {
     render() {
 
         const { navigate } = this.props.navigation;
-        const renderFavoriteItem = ({item}) => {
+        const renderFavoriteItem = ({ item }) => {
+            const rightButton = [
+                {
+                    text: 'Delete',
+                    type: 'delete',
+                    onPress: () => {
+                        Alert.alert(
+                            'Delete Favorite?',
+                            'Are you sure you wish to delete the favorite campsite ' + item.name + '?',
+                            [
+                                {
+                                    text: 'Cancel',
+                                    onPress: () => console.log(item.name + ' Not Deleted'),
+                                    style: 'cancel'
+                                },
+                                {
+                                    text: 'OK',
+                                    onPress: () => this.props.deleteFavorite(item.id)
+                                }
+                            ],
+                            { cancelable: false }
+                        )
+                    }
+
+
+                }
+            ];
+
             return (
-                <ListItem
-                    title={item.name}
-                    subtitle={item.description}
-                    leftAvatar={{source: {uri: baseUrl + item.image}}}
-                    onPress={() => navigate('CampsiteInfo', {campsiteId: item.id})}
-                />
+                <Swipeout right={rightButton} autoClose={true}>
+                    <ListItem
+                        title={item.name}
+                        subtitle={item.description}
+                        leftAvatar={{ source: { uri: baseUrl + item.image } }}
+                        onPress={() => navigate('CampsiteInfo', { campsiteId: item.id })}
+                    />
+                </Swipeout>
             );
         }
 
-        if(this.props.campsites.isLoading) {
+        if (this.props.campsites.isLoading) {
             return <Loading />;
         }
         if (this.props.errMess) {
-            return(
+            return (
                 <View>
                     <Text>{this.props.campsites.errMess}</Text>
                 </View>
@@ -53,7 +88,7 @@ class Favorites extends Component {
         )
     }
 
-   
+
 }
 
-export default connect(mapStateToProps)(Favorites);
+export default connect(mapStateToProps, mapDispatchToProps)(Favorites);
